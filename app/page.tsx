@@ -3,16 +3,16 @@ import {ChangeEvent,FormEvent,useMemo,useState} from "react";
 import {createClient} from "@/lib/supabase/client";
 
 const cats=[
-  ["Electronics","Phones, games & tech","⌁"],
-  ["Clothing","Fashion & accessories","♢"],
-  ["Home & Furniture","Furniture & décor","⌂"],
-  ["Collectibles","Cards, art & vintage","✦"],
-  ["Sporting Goods","Fitness & outdoors","◒"]
+  ["Automobiles","Cars, trucks & local dealers","◉"],
+  ["Furniture","Home furniture & décor","⌂"],
+  ["Phones","Phones, accessories & service","⌁"],
+  ["Stereo Shops","Audio systems & installation","♫"],
+  ["Wheels and Tire Shops","Wheels, tires & service","◒"]
 ];
 const items=[
-  {title:"iPhone 15 Pro · 256GB",price:"$675",place:"Fresno · 2 mi",cat:"Electronics",image:"https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=900&q=80"},
-  {title:"Mid-century lounge chair",price:"$240",place:"Clovis · 5 mi",cat:"Home & Furniture",image:"https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=900&q=80"},
-  {title:"Retro low-top sneakers",price:"$55",place:"Madera · 18 mi",cat:"Clothing",image:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80"}
+  {title:"Late-model local automobile",price:"$18,900",place:"Fresno · 2 mi",cat:"Automobiles",image:"https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=80"},
+  {title:"Mid-century lounge chair",price:"$240",place:"Clovis · 5 mi",cat:"Furniture",image:"https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=900&q=80"},
+  {title:"Premium wheel package",price:"$899",place:"Madera · 18 mi",cat:"Wheels and Tire Shops",image:"https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=900&q=80"}
 ];
 
 export default function Home(){
@@ -24,10 +24,9 @@ export default function Home(){
  const submitAuth=async(e:FormEvent<HTMLFormElement>)=>{e.preventDefault();setBusy(true);setError("");const form=new FormData(e.currentTarget),email=String(form.get("email")),password=String(form.get("password")),mode=String(form.get("mode"));const supabase=createClient();if(mode==="signin"){const {error:authError}=await supabase.auth.signInWithPassword({email,password});setBusy(false);if(authError){setError(authError.message);return}done("Signed in to AdLoca.");return}const metadata={display_name:String(form.get("displayName")),home_zip:String(form.get("homeZip")),account_type:String(form.get("accountType")),business_name:String(form.get("businessName"))};const {data,error:authError}=await supabase.auth.signUp({email,password,options:{data:metadata,emailRedirectTo:`${location.origin}/auth/callback`}});setBusy(false);if(authError){setError(authError.message);return}done(data.session?"AdLoca account created.":"Check your email to confirm your AdLoca account.")};
  return <main>
   <header><a className="brand" href="#"><i>A</i><b>AdLoca<small>LOCAL ADS. REAL LOCATIONS.</small></b></a><nav><a href="#browse">Browse</a><a href="#safe">How it works</a><a href="/account">My account</a><a href="https://www.polepost.org">PolePost</a></nav><div><button className="plain" onClick={()=>{setError("");setProfile(true)}}>Sign in</button><button className="button" onClick={()=>{setError("");setPost(true)}}>＋ Post an item</button></div></header>
-  <section className="hero"><span className="kicker">● BUY & SELL CLOSER TO HOME</span><h1>Find it <em>near you.</em><br/>Sell it with confidence.</h1><p>Local listings organized by real locations. Meet nearby and use AdLoca Tokens for extra transaction protection.</p><div className="search"><label>⌕ <input aria-label="Search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="What are you looking for?"/></label><label>⌖ <input aria-label="Location" defaultValue="Fresno County, CA"/></label><a className="button" href="#browse">Search</a></div><div className="popular">Popular: {['iPhone','Furniture','Sneakers','Collectibles'].map(x=><button key={x} onClick={()=>setQuery(x)}>{x}</button>)}</div></section>
+  <section className="hero"><span className="kicker">● SHOP CLOSER TO HOME</span><h1>Local Listings by<br/><em>Local Businesses.</em></h1><div className="search"><label>⌕ <input aria-label="Search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="What are you looking for?"/></label><label>⌖ <input aria-label="Location" defaultValue="Fresno County, CA"/></label><a className="button" href="#browse">Search</a></div><div className="popular">Popular: {['Automobiles','Furniture','Phones','Tires'].map(x=><button key={x} onClick={()=>setQuery(x)}>{x}</button>)}</div></section>
   <section className="wrap"><div className="heading"><div><span className="kicker">START LOCAL</span><h2>What are you looking for?</h2></div><button className="plain" onClick={()=>setFilter("All")}>View all categories →</button></div><div className="categories">{cats.map(c=><button className={filter===c[0]?"category active":"category"} onClick={()=>setFilter(c[0])} key={c[0]}><i>{c[2]}</i><b>{c[0]}</b><small>{c[1]}</small><span>→</span></button>)}</div></section>
   <section className="wrap listings" id="browse"><div className="heading"><div><span className="kicker">NEAR FRESNO COUNTY</span><h2>Fresh local finds</h2></div><small>{visible.length} listings shown</small></div><div className="cards">{visible.map(x=><article key={x.title}><div className="pic"><img src={x.image} alt=""/><span>Verified location</span><button>♡</button></div><div className="copy"><small>{x.cat}</small><h3>{x.title}</h3><b>{x.price}</b><p>⌖ {x.place}</p></div></article>)}</div>{!visible.length&&<div className="empty">No matches yet. Try another search or category.</div>}</section>
-  <section className="safe" id="safe"><div><span className="kicker">A SAFER WAY TO TRADE</span><h2>No cash between strangers.</h2><p>Reserve AdLoca Tokens, confirm the exchange with a secure QR code, and release them when both sides are satisfied.</p></div><ol>{[["1","Agree","Make or accept an offer"],["2","Reserve","Tokens are held securely"],["3","Confirm","Scan to complete the sale"]].map(x=><li key={x[0]}><b>{x[0]}</b><span><strong>{x[1]}</strong><small>{x[2]}</small></span></li>)}</ol></section>
   <section className="pole"><i>P</i><div><small>POWERED BY LOCAL COMMUNITY</small><h2>Selling something? Post it where neighbors look.</h2><p>PolePost gets the word out. AdLoca gets it sold.</p></div><a href="https://www.polepost.org">Visit PolePost ↗</a></section>
   <footer><span>AdLoca</span><p>Local ads. Real locations. Safer exchanges.</p><small>© 2026 AdLoca</small></footer>
   {toast&&<div className="toast">✓ {toast}</div>}
