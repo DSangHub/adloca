@@ -1,5 +1,24 @@
 # vinext-starter
 
+## AdLoca backend setup
+
+AdLoca uses Supabase Auth/Postgres for accounts and listings, and Stripe Billing
+for the business advertising plan.
+
+1. Run `supabase/migrations/20260922000000_adloca_accounts.sql` in the Supabase
+   SQL editor.
+2. Add the variables documented in `.env.example` to the hosting environment.
+3. Create one recurring Stripe Price and store its ID as
+   `STRIPE_ADLOCA_PRO_PRICE_ID`.
+4. Add a Stripe webhook endpoint at `/api/stripe/webhook` for
+   `checkout.session.completed`, `customer.subscription.updated`, and
+   `customer.subscription.deleted`.
+5. Set the Supabase Site URL and redirect allow list to include
+   `https://YOUR_DOMAIN/auth/callback`.
+
+Secret and service-role keys are server-only. Never prefix them with
+`NEXT_PUBLIC_` or commit them.
+
 A clean full-stack starter running on
 [vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
 Drizzle support.
